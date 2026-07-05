@@ -2,9 +2,9 @@ import DashboardCard from "./DashboardCard";
 
 export default function Dashboard() {
   return (
-    <section
-      className="max-w-7xl mx-auto py-32 px-8"
+      <section
       id="dashboard"
+          className="max-w-7xl mx-auto pt-40 pb-32 px-8"
     >
       <h2 className="text-5xl font-black text-center mb-6">
         AI Deployment
@@ -15,8 +15,7 @@ export default function Dashboard() {
         Monitor every deployment from one intelligent dashboard.
       </p>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
         <DashboardCard
           title="Repository"
           value="DeployAI"
@@ -39,8 +38,7 @@ export default function Dashboard() {
           title="AI Score"
           value="98 / 100"
           status="Excellent"
-        />
-
+          />
       </div>
     </section>
   );
