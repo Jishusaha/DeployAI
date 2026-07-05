@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
+import Dashboard from "@/components/Dashboard";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -11,6 +12,8 @@ export default function Home() {
       <Hero />
 
       <Features />
+
+      <Dashboard />
 
       <Footer />
     </main>
