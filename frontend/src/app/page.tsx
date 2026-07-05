@@ -2,6 +2,7 @@ import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Features from "@/components/Features";
 import Dashboard from "@/components/Dashboard";
+import RepositoryAnalyzer from "@/components/RepositoryAnalyzer";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -14,7 +15,7 @@ export default function Home() {
       <Features />
 
       <Dashboard />
-
+      <RepositoryAnalyzer />  
       <Footer />
     </main>
   );
