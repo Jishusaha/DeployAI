@@ -2,53 +2,135 @@
 
 import { useState } from "react";
 
+interface RepoData {
+  name: string;
+  owner: string;
+  language: string;
+  stars: number;
+  visibility: string;
+}
+
 export default function RepositoryAnalyzer() {
   const [repoUrl, setRepoUrl] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [repoData, setRepoData] = useState<RepoData | null>(null);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!repoUrl.trim()) {
       alert("Please enter a GitHub repository URL.");
       return;
     }
 
-    alert(`Analyzing:\n${repoUrl}`);
+    const match = repoUrl.match(/github\.com\/([^/]+)\/([^/]+)/);
+
+    if (!match) {
+      alert("Invalid GitHub Repository URL.");
+      return;
+    }
+
+    const owner = match[1];
+    const repo = match[2];
+
+    setIsLoading(true);
+    setRepoData(null);
+
+    try {
+      const response = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}`
+      );
+
+      if (!response.ok) {
+        throw new Error("Repository not found");
+      }
+
+      const data = await response.json();
+
+      setRepoData({
+        name: data.name,
+        owner: data.owner.login,
+        language: data.language,
+        stars: data.stargazers_count,
+        visibility: data.visibility,
+      });
+    } catch (error) {
+      alert("Failed to fetch repository.");
+    }
+
+    setIsLoading(false);
   };
 
   return (
-    <section
-      id="analyzer"
-      className="max-w-5xl mx-auto py-32 px-8"
-    >
+    <section className="max-w-5xl mx-auto py-32 px-8">
       <h2 className="text-5xl font-black text-center">
         AI Repository
         <span className="text-cyan-400"> Analyzer</span>
       </h2>
 
       <p className="text-center text-gray-400 mt-6 mb-16">
-        Paste any GitHub repository and let DeployAI analyze
-        the best deployment strategy.
+        Analyze any public GitHub repository.
       </p>
 
-      <div className="bg-[#0d1224] border border-cyan-500/20 rounded-2xl p-10">
+      <div className="bg-[#0d1224] rounded-2xl border border-cyan-500/20 p-10">
 
-        <label className="block text-lg mb-4 font-semibold">
+        <label className="block mb-4 font-semibold">
           GitHub Repository URL
         </label>
 
         <input
           type="text"
-          placeholder="https://github.com/vercel/next.js"
           value={repoUrl}
           onChange={(e) => setRepoUrl(e.target.value)}
-          className="w-full rounded-xl bg-[#111827] border border-cyan-500/20 px-5 py-4 text-white outline-none focus:border-cyan-400 transition"
+          placeholder="https://github.com/vercel/next.js"
+          className="w-full bg-[#111827] rounded-xl border border-cyan-500/20 px-5 py-4 outline-none focus:border-cyan-400"
         />
 
         <button
           onClick={handleAnalyze}
-          className="mt-8 w-full bg-cyan-500 hover:bg-cyan-600 transition py-4 rounded-xl font-bold text-lg"
+          disabled={isLoading}
+          className={`mt-8 w-full py-4 rounded-xl font-bold transition ${
+            isLoading
+              ? "bg-gray-600"
+              : "bg-cyan-500 hover:bg-cyan-600"
+          }`}
         >
-          Analyze Repository
+          {isLoading
+            ? "Analyzing..."
+            : "Analyze Repository"}
         </button>
+
+        {repoData && (
+          <div className="mt-10 bg-[#111827] rounded-xl p-8 border border-cyan-500/20">
+
+            <h3 className="text-3xl font-bold text-cyan-400 mb-8">
+              Repository Details
+            </h3>
+
+            <div className="space-y-4">
+
+              <p>
+                <strong>Name:</strong> {repoData.name}
+              </p>
+
+              <p>
+                <strong>Owner:</strong> {repoData.owner}
+              </p>
+
+              <p>
+                <strong>Language:</strong> {repoData.language}
+              </p>
+
+              <p>
+                <strong>Stars:</strong> ⭐ {repoData.stars}
+              </p>
+
+              <p>
+                <strong>Visibility:</strong> {repoData.visibility}
+              </p>
+
+            </div>
+
+          </div>
+        )}
 
       </div>
     </section>
