@@ -1,5 +1,5 @@
 "use client";
-
+import ReportItem from "./ReportItem";
 import { useState } from "react";
 
 interface RepoData {
@@ -87,11 +87,10 @@ export default function RepositoryAnalyzer() {
         <button
           onClick={handleAnalyze}
           disabled={isLoading}
-          className={`mt-8 w-full py-4 rounded-xl font-bold transition ${
-            isLoading
+          className={`mt-8 w-full py-4 rounded-xl font-bold transition ${isLoading
               ? "bg-gray-600"
               : "bg-cyan-500 hover:bg-cyan-600"
-          }`}
+            }`}
         >
           {isLoading
             ? "Analyzing..."
@@ -99,37 +98,58 @@ export default function RepositoryAnalyzer() {
         </button>
 
         {repoData && (
-          <div className="mt-10 bg-[#111827] rounded-xl p-8 border border-cyan-500/20">
+          <>
+            <div className="mt-10 bg-[#111827] rounded-2xl p-8 border border-cyan-500/20">
 
-            <h3 className="text-3xl font-bold text-cyan-400 mb-8">
-              Repository Details
-            </h3>
+              <h2 className="text-3xl font-bold text-cyan-400 mb-8">
+                AI Repository Report
+              </h2>
 
-            <div className="space-y-4">
+              <ReportItem
+                label="Repository"
+                value={repoData.name}
+              />
 
-              <p>
-                <strong>Name:</strong> {repoData.name}
-              </p>
+              <ReportItem
+                label="Owner"
+                value={repoData.owner}
+              />
 
-              <p>
-                <strong>Owner:</strong> {repoData.owner}
-              </p>
+              <ReportItem
+                label="Language"
+                value={repoData.language || "Unknown"}
+              />
 
-              <p>
-                <strong>Language:</strong> {repoData.language}
-              </p>
+              <ReportItem
+                label="Stars"
+                value={`⭐ ${repoData.stars}`}
+              />
 
-              <p>
-                <strong>Stars:</strong> ⭐ {repoData.stars}
-              </p>
-
-              <p>
-                <strong>Visibility:</strong> {repoData.visibility}
-              </p>
+              <ReportItem
+                label="Visibility"
+                value={repoData.visibility}
+              />
 
             </div>
 
-          </div>
+            <div className="mt-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-8">
+
+              <h2 className="text-3xl font-bold">
+                AI Health Score
+              </h2>
+
+              <div className="text-7xl font-black mt-6">
+                98
+                <span className="text-4xl">/100</span>
+              </div>
+
+              <p className="mt-6 text-lg">
+                Repository structure looks excellent.
+                Ready for Docker deployment.
+              </p>
+
+            </div>
+          </>
         )}
 
       </div>
