@@ -8,6 +8,10 @@ interface RepoData {
   language: string;
   stars: number;
   visibility: string;
+
+  forks: number;
+  hasLicense: boolean;
+  defaultBranch: string;
 }
 
 export default function RepositoryAnalyzer() {
@@ -51,12 +55,35 @@ export default function RepositoryAnalyzer() {
         language: data.language,
         stars: data.stargazers_count,
         visibility: data.visibility,
+
+        forks: data.forks_count,
+        hasLicense: data.license !== null,
+        defaultBranch: data.default_branch,
       });
     } catch (error) {
       alert("Failed to fetch repository.");
     }
 
     setIsLoading(false);
+  };
+  const calculateHealthScore = () => {
+    if (!repoData) return 0;
+
+    let score = 50;
+
+    if (repoData.language === "TypeScript") score += 15;
+    if (repoData.language === "Python") score += 12;
+
+    if (repoData.stars > 1000) score += 10;
+    if (repoData.stars > 10000) score += 10;
+
+    if (repoData.hasLicense) score += 5;
+
+    if (repoData.forks > 100) score += 5;
+
+    if (repoData.visibility === "public") score += 5;
+
+    return Math.min(score, 100);
   };
 
   return (
@@ -88,8 +115,8 @@ export default function RepositoryAnalyzer() {
           onClick={handleAnalyze}
           disabled={isLoading}
           className={`mt-8 w-full py-4 rounded-xl font-bold transition ${isLoading
-              ? "bg-gray-600"
-              : "bg-cyan-500 hover:bg-cyan-600"
+            ? "bg-gray-600"
+            : "bg-cyan-500 hover:bg-cyan-600"
             }`}
         >
           {isLoading
@@ -130,6 +157,20 @@ export default function RepositoryAnalyzer() {
                 value={repoData.visibility}
               />
 
+              <ReportItem
+                label="Forks"
+                value={repoData.forks}
+              />
+
+              <ReportItem
+                label="License"
+                value={repoData.hasLicense ? "Yes" : "No"}
+              />
+
+              <ReportItem
+                label="Default Branch"
+                value={repoData.defaultBranch}
+              />
             </div>
 
             <div className="mt-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-8">
@@ -139,14 +180,39 @@ export default function RepositoryAnalyzer() {
               </h2>
 
               <div className="text-7xl font-black mt-6">
-                98
+                {calculateHealthScore()}
                 <span className="text-4xl">/100</span>
               </div>
 
-              <p className="mt-6 text-lg">
-                Repository structure looks excellent.
-                Ready for Docker deployment.
-              </p>
+              <div className="mt-8">
+
+                <h3 className="text-2xl font-bold mb-4">
+                  AI Suggestions
+                </h3>
+
+                <ul className="space-y-3 text-lg">
+
+                  {!repoData.hasLicense && (
+                    <li>📄 Add a LICENSE file.</li>
+                  )}
+
+                  {repoData.language !== "TypeScript" && (
+                    <li>⚡ Consider TypeScript for better maintainability.</li>
+                  )}
+
+                  {repoData.stars < 100 && (
+                    <li>⭐ Grow community engagement.</li>
+                  )}
+
+                  <li>🐳 Add Docker support.</li>
+
+                  <li>⚙️ Add GitHub Actions CI/CD.</li>
+
+                  <li>☁️ Deploy to Vercel or AWS.</li>
+
+                </ul>
+
+              </div>
 
             </div>
           </>
