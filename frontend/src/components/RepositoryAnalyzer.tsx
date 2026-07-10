@@ -1,6 +1,7 @@
 "use client";
 import ReportItem from "./ReportItem";
 import { useState } from "react";
+import InspectionItem from "./InspectionItem";
 
 interface RepoData {
   name: string;
@@ -12,12 +13,29 @@ interface RepoData {
   forks: number;
   hasLicense: boolean;
   defaultBranch: string;
+
+  hasReadme: boolean;
+  hasPackageJson: boolean;
+  hasDockerfile: boolean;
+  hasGithubActions: boolean;
 }
 
 export default function RepositoryAnalyzer() {
   const [repoUrl, setRepoUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [repoData, setRepoData] = useState<RepoData | null>(null);
+
+  const checkFile = async (
+    owner: string,
+    repo: string,
+    path: string
+  ) => {
+    const response = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`
+    );
+
+    return response.ok;
+  };
 
   const handleAnalyze = async () => {
     if (!repoUrl.trim()) {
@@ -49,6 +67,19 @@ export default function RepositoryAnalyzer() {
 
       const data = await response.json();
 
+      const hasReadme = await checkFile(owner, repo, "README.md");
+
+      const hasPackageJson = await checkFile(owner, repo, "package.json");
+
+      const hasDockerfile = await checkFile(owner, repo, "Dockerfile");
+
+      const hasGithubActions = await checkFile(
+        owner,
+        repo,
+        ".github/workflows"
+      );
+
+
       setRepoData({
         name: data.name,
         owner: data.owner.login,
@@ -59,6 +90,11 @@ export default function RepositoryAnalyzer() {
         forks: data.forks_count,
         hasLicense: data.license !== null,
         defaultBranch: data.default_branch,
+
+        hasReadme,
+        hasPackageJson,
+        hasDockerfile,
+        hasGithubActions
       });
     } catch (error) {
       alert("Failed to fetch repository.");
@@ -172,6 +208,38 @@ export default function RepositoryAnalyzer() {
                 value={repoData.defaultBranch}
               />
             </div>
+            <div className="mt-8 bg-[#111827] rounded-2xl p-8 border border-cyan-500/20">
+
+              <h2 className="text-3xl font-bold text-cyan-400 mb-8">
+                Repository Inspection
+              </h2>
+
+              <InspectionItem
+                label="README"
+                status={repoData.hasReadme}
+              />
+
+              <InspectionItem
+                label="package.json"
+                status={repoData.hasPackageJson}
+              />
+
+              <InspectionItem
+                label="Dockerfile"
+                status={repoData.hasDockerfile}
+              />
+
+              <InspectionItem
+                label="GitHub Actions"
+                status={repoData.hasGithubActions}
+              />
+
+              <InspectionItem
+                label="LICENSE"
+                status={repoData.hasLicense}
+              />
+
+            </div>
 
             <div className="mt-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-8">
 
@@ -192,23 +260,28 @@ export default function RepositoryAnalyzer() {
 
                 <ul className="space-y-3 text-lg">
 
+                  {!repoData.hasDockerfile && (
+                    <li>🐳 Add a Dockerfile for containerized deployments.</li>
+                  )}
+
+                  {!repoData.hasGithubActions && (
+                    <li>⚙ Configure GitHub Actions for CI/CD.</li>
+                  )}
+
                   {!repoData.hasLicense && (
                     <li>📄 Add a LICENSE file.</li>
                   )}
 
-                  {repoData.language !== "TypeScript" && (
-                    <li>⚡ Consider TypeScript for better maintainability.</li>
+                  {!repoData.hasReadme && (
+                    <li>📘 Create a README.md with setup instructions.</li>
                   )}
 
-                  {repoData.stars < 100 && (
-                    <li>⭐ Grow community engagement.</li>
-                  )}
+                  {!repoData.hasPackageJson &&
+                    repoData.language === "JavaScript" && (
+                      <li>📦 Missing package.json.</li>
+                    )}
 
-                  <li>🐳 Add Docker support.</li>
-
-                  <li>⚙️ Add GitHub Actions CI/CD.</li>
-
-                  <li>☁️ Deploy to Vercel or AWS.</li>
+                  <li>☁ Recommended Cloud: Vercel</li>
 
                 </ul>
 
