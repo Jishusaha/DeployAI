@@ -2,6 +2,11 @@
 import ReportItem from "./ReportItem";
 import { useState } from "react";
 import InspectionItem from "./InspectionItem";
+import ProjectType from "./ProjectType";
+import ReadinessBar from "./ReadinessBar";
+import CloudRecommendation from "./CloudRecommendation";
+import RepositoryHeader from "./RepositoryHeader";
+import AIVerdict from "./AIVerdict";
 
 interface RepoData {
   name: string;
@@ -18,6 +23,10 @@ interface RepoData {
   hasPackageJson: boolean;
   hasDockerfile: boolean;
   hasGithubActions: boolean;
+
+  description: string;
+  avatar: string;
+  homepage: string;
 }
 
 export default function RepositoryAnalyzer() {
@@ -25,17 +34,6 @@ export default function RepositoryAnalyzer() {
   const [isLoading, setIsLoading] = useState(false);
   const [repoData, setRepoData] = useState<RepoData | null>(null);
 
-  const checkFile = async (
-    owner: string,
-    repo: string,
-    path: string
-  ) => {
-    const response = await fetch(
-      `https://api.github.com/repos/${owner}/${repo}/contents/${path}`
-    );
-
-    return response.ok;
-  };
 
   const handleAnalyze = async () => {
     if (!repoUrl.trim()) {
@@ -67,17 +65,36 @@ export default function RepositoryAnalyzer() {
 
       const data = await response.json();
 
-      const hasReadme = await checkFile(owner, repo, "README.md");
-
-      const hasPackageJson = await checkFile(owner, repo, "package.json");
-
-      const hasDockerfile = await checkFile(owner, repo, "Dockerfile");
-
-      const hasGithubActions = await checkFile(
-        owner,
-        repo,
-        ".github/workflows"
+      const contentsResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/contents`
       );
+
+      if (!contentsResponse.ok) {
+        throw new Error("Unable to inspect repository.");
+      }
+
+      const contents = await contentsResponse.json();
+
+      const files = contents.map(
+        (item: { name: string }) => item.name.toLowerCase()
+      );
+
+      const hasReadme = files.some((name: string) =>
+        name.startsWith("readme")
+      );
+
+      const hasPackageJson =
+        files.includes("package.json");
+
+      const hasDockerfile =
+        files.includes("dockerfile");
+
+      const actionsResponse = await fetch(
+        `https://api.github.com/repos/${owner}/${repo}/contents/.github/workflows`
+      );
+
+      const hasGithubActions = actionsResponse.ok;
+
 
 
       setRepoData({
@@ -94,7 +111,11 @@ export default function RepositoryAnalyzer() {
         hasReadme,
         hasPackageJson,
         hasDockerfile,
-        hasGithubActions
+        hasGithubActions,
+
+        description: data.description,
+        avatar: data.owner.avatar_url,
+        homepage: data.homepage
       });
     } catch (error) {
       alert("Failed to fetch repository.");
@@ -103,23 +124,38 @@ export default function RepositoryAnalyzer() {
     setIsLoading(false);
   };
   const calculateHealthScore = () => {
-    if (!repoData) return 0;
 
-    let score = 50;
+    let score = 0;
 
-    if (repoData.language === "TypeScript") score += 15;
-    if (repoData.language === "Python") score += 12;
+    if (repoData?.hasReadme)
+      score += 10;
 
-    if (repoData.stars > 1000) score += 10;
-    if (repoData.stars > 10000) score += 10;
+    if (repoData?.hasLicense)
+      score += 10;
 
-    if (repoData.hasLicense) score += 5;
+    if (repoData?.hasPackageJson)
+      score += 10;
 
-    if (repoData.forks > 100) score += 5;
+    if (repoData?.hasGithubActions)
+      score += 15;
 
-    if (repoData.visibility === "public") score += 5;
+    if (repoData?.hasDockerfile)
+      score += 15;
+
+    if (repoData?.visibility === "public")
+      score += 10;
+
+    if ((repoData?.stars ?? 0) > 100)
+      score += 10;
+
+    if ((repoData?.stars ?? 0) > 1000)
+      score += 10;
+
+    if (repoData?.language)
+      score += 10;
 
     return Math.min(score, 100);
+
   };
 
   return (
@@ -162,6 +198,17 @@ export default function RepositoryAnalyzer() {
 
         {repoData && (
           <>
+            <RepositoryHeader
+
+              avatar={repoData.avatar}
+
+              repo={repoData.name}
+
+              owner={repoData.owner}
+
+              description={repoData.description}
+
+            />
             <div className="mt-10 bg-[#111827] rounded-2xl p-8 border border-cyan-500/20">
 
               <h2 className="text-3xl font-bold text-cyan-400 mb-8">
@@ -240,7 +287,10 @@ export default function RepositoryAnalyzer() {
               />
 
             </div>
-
+            <ProjectType
+              language={repoData.language}
+              hasPackageJson={repoData.hasPackageJson}
+            />
             <div className="mt-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-8">
 
               <h2 className="text-3xl font-bold">
@@ -252,6 +302,9 @@ export default function RepositoryAnalyzer() {
                 <span className="text-4xl">/100</span>
               </div>
 
+              <ReadinessBar
+                score={calculateHealthScore()}
+              />
               <div className="mt-8">
 
                 <h3 className="text-2xl font-bold mb-4">
@@ -288,6 +341,14 @@ export default function RepositoryAnalyzer() {
               </div>
 
             </div>
+            <AIVerdict
+              repo={repoData}
+              score={calculateHealthScore()}
+            />
+
+            <CloudRecommendation
+              language={repoData.language}
+            />
           </>
         )}
 
