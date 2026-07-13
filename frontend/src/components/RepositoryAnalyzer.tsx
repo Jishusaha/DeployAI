@@ -27,6 +27,9 @@ interface RepoData {
   description: string;
   avatar: string;
   homepage: string;
+
+  framework: string;
+  ecosystem: string;
 }
 
 export default function RepositoryAnalyzer() {
@@ -89,6 +92,219 @@ export default function RepositoryAnalyzer() {
       const hasDockerfile =
         files.includes("dockerfile");
 
+      let framework = "Unknown";
+      let ecosystem = "Unknown";
+
+      /* ---------- JavaScript ---------- */
+
+      if (hasPackageJson) {
+
+        ecosystem = "JavaScript";
+
+        try {
+
+          const packageResponse = await fetch(
+            `https://raw.githubusercontent.com/${owner}/${repo}/${data.default_branch}/package.json`
+          );
+
+          if (packageResponse.ok) {
+
+            const packageData = await packageResponse.json();
+
+            const dependencies = {
+
+              ...packageData.dependencies,
+
+              ...packageData.devDependencies,
+
+            };
+
+            if (dependencies.next)
+
+              framework = "Next.js";
+
+            else if (dependencies.react)
+
+              framework = "React";
+
+            else if (dependencies.express)
+
+              framework = "Express";
+
+            else if (dependencies["@nestjs/core"])
+
+              framework = "NestJS";
+
+            else if (dependencies.electron)
+
+              framework = "Electron";
+
+            else if (dependencies.vue)
+
+              framework = "Vue";
+
+            else if (dependencies.vite)
+
+              framework = "Vite";
+
+            else
+
+              framework = "Node.js";
+
+          }
+
+        } catch { }
+
+      }
+
+      /* ---------- Python ---------- */
+
+      if (framework === "Unknown") {
+
+        const pythonFiles = [
+
+          "requirements.txt",
+
+          "pyproject.toml",
+
+        ];
+
+        for (const file of pythonFiles) {
+
+          const response = await fetch(
+            `https://raw.githubusercontent.com/${owner}/${repo}/${data.default_branch}/${file}`
+          );
+
+          if (!response.ok) continue;
+
+          ecosystem = "Python";
+
+          const text = (await response.text()).toLowerCase();
+
+          if (text.includes("fastapi"))
+
+            framework = "FastAPI";
+
+          else if (text.includes("django"))
+
+            framework = "Django";
+
+          else if (text.includes("flask"))
+
+            framework = "Flask";
+
+          else
+
+            framework = "Python";
+
+          break;
+
+        }
+
+      }
+
+      /* ---------- Java ---------- */
+
+      if (framework === "Unknown") {
+
+        const javaFiles = [
+
+          "pom.xml",
+
+          "build.gradle",
+
+        ];
+
+        for (const file of javaFiles) {
+
+          const response = await fetch(
+            `https://raw.githubusercontent.com/${owner}/${repo}/${data.default_branch}/${file}`
+          );
+
+          if (!response.ok) continue;
+
+          ecosystem = "Java";
+
+          const text = (await response.text()).toLowerCase();
+
+          if (text.includes("spring-boot"))
+
+            framework = "Spring Boot";
+
+          else
+
+            framework = "Java";
+
+          break;
+
+        }
+
+      }
+
+      /* ---------- Go ---------- */
+
+      if (framework === "Unknown") {
+
+        const response = await fetch(
+          `https://raw.githubusercontent.com/${owner}/${repo}/${data.default_branch}/go.mod`
+        );
+
+        if (response.ok) {
+
+          ecosystem = "Go";
+
+          framework = "Go";
+
+        }
+
+      }
+
+      /* ---------- Rust ---------- */
+
+      if (framework === "Unknown") {
+
+        const response = await fetch(
+          `https://raw.githubusercontent.com/${owner}/${repo}/${data.default_branch}/Cargo.toml`
+        );
+
+        if (response.ok) {
+
+          ecosystem = "Rust";
+
+          framework = "Rust";
+
+        }
+
+      }
+
+      /* ---------- PHP ---------- */
+
+      if (framework === "Unknown") {
+
+        const response = await fetch(
+          `https://raw.githubusercontent.com/${owner}/${repo}/${data.default_branch}/composer.json`
+        );
+
+        if (response.ok) {
+
+          ecosystem = "PHP";
+
+          const text = (await response.text()).toLowerCase();
+
+          if (text.includes("laravel"))
+
+            framework = "Laravel";
+
+          else
+
+            framework = "PHP";
+
+        }
+
+      }
+
+
+
       const actionsResponse = await fetch(
         `https://api.github.com/repos/${owner}/${repo}/contents/.github/workflows`
       );
@@ -115,14 +331,17 @@ export default function RepositoryAnalyzer() {
 
         description: data.description,
         avatar: data.owner.avatar_url,
-        homepage: data.homepage
+        homepage: data.homepage,
+        framework,
+        ecosystem,
       });
     } catch (error) {
       alert("Failed to fetch repository.");
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
+
   const calculateHealthScore = () => {
 
     let score = 0;
@@ -288,8 +507,7 @@ export default function RepositoryAnalyzer() {
 
             </div>
             <ProjectType
-              language={repoData.language}
-              hasPackageJson={repoData.hasPackageJson}
+              framework={repoData.framework}
             />
             <div className="mt-8 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-2xl p-8">
 
@@ -334,7 +552,7 @@ export default function RepositoryAnalyzer() {
                       <li>📦 Missing package.json.</li>
                     )}
 
-                  <li>☁ Recommended Cloud: Vercel</li>
+
 
                 </ul>
 
@@ -347,7 +565,7 @@ export default function RepositoryAnalyzer() {
             />
 
             <CloudRecommendation
-              language={repoData.language}
+              framework={repoData.framework}
             />
           </>
         )}

@@ -1,57 +1,88 @@
-interface Props{
+interface Props {
 
-repo:any;
+    repo: any;
 
-score:number;
+    score: number;
 
 }
 
 export default function AIVerdict({
 
-repo,
+    repo,
 
-score
+    score
 
-}:Props){
+}: Props) {
 
-let verdict="";
+    let verdict = "";
 
-if(score>=90){
+    if (repo.framework === "Next.js") {
 
-verdict="Excellent repository. Production ready.";
+        verdict =
+            "Production-ready Next.js application. Native Vercel deployment is recommended. Docker is optional.";
 
-}
+    }
 
-else if(score>=75){
+    else if (repo.framework === "Express") {
 
-verdict="Good quality repository with minor improvements recommended.";
+        verdict =
+            "Backend API detected. Docker and CI/CD are recommended before production deployment.";
 
-}
+    }
 
-else{
+    else if (repo.framework === "Electron") {
 
-verdict="Repository requires additional setup before deployment.";
+        verdict =
+            "Desktop application detected. Cloud deployment is not applicable. Focus on installer packaging.";
 
-}
+    }
 
-return(
+    else if (repo.framework === "FastAPI") {
 
-<div className="mt-8 bg-[#111827] rounded-2xl border border-cyan-500/20 p-8">
+        verdict =
+            "FastAPI backend detected. Railway or Docker deployment is recommended for production.";
 
-<h2 className="text-3xl font-bold text-cyan-400 mb-6">
+    }
 
-AI Verdict
+    else if (score >= 90) {
 
-</h2>
+        verdict =
+            "Excellent repository with production-ready configuration.";
 
-<p className="text-lg text-gray-300 leading-8">
+    }
 
-{verdict}
+    else if (score >= 70) {
 
-</p>
+        verdict =
+            "Good quality repository with a few recommended improvements.";
 
-</div>
+    }
 
-)
+    else {
+
+        verdict =
+            "Repository requires additional configuration before production deployment.";
+
+    }
+
+    return (
+
+        <div className="mt-8 bg-[#111827] rounded-2xl border border-cyan-500/20 p-8">
+
+            <h2 className="text-3xl font-bold text-cyan-400 mb-6">
+
+                AI Verdict
+
+            </h2>
+
+            <p className="text-lg text-gray-300 leading-8">
+
+                {verdict}
+
+            </p>
+
+        </div>
+
+    )
 
 }
