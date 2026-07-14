@@ -7,6 +7,9 @@ import ReadinessBar from "./ReadinessBar";
 import CloudRecommendation from "./CloudRecommendation";
 import RepositoryHeader from "./RepositoryHeader";
 import AIVerdict from "./AIVerdict";
+import AIAnalysis from "./AIAnalysis";
+import RiskAnalyzer from "./RiskAnalyzer";
+
 
 interface RepoData {
   name: string;
@@ -563,7 +566,13 @@ export default function RepositoryAnalyzer() {
               repo={repoData}
               score={calculateHealthScore()}
             />
-
+            <AIAnalysis
+              repo={repoData}
+              score={calculateHealthScore()}
+            />
+            <RiskAnalyzer
+              repo={repoData}
+            />
             <CloudRecommendation
               framework={repoData.framework}
             />
