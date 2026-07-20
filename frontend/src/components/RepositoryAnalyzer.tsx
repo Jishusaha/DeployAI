@@ -9,6 +9,8 @@ import RepositoryHeader from "./RepositoryHeader";
 import AIVerdict from "./AIVerdict";
 import AIAnalysis from "./AIAnalysis";
 import RiskAnalyzer from "./RiskAnalyzer";
+import DeploymentPlanner from "./DeploymentPlanner";
+import MetricsDashboard from "./MetricsDashboard";
 
 
 interface RepoData {
@@ -33,6 +35,11 @@ interface RepoData {
 
   framework: string;
   ecosystem: string;
+
+  watchers: number;
+  issues: number;
+  size: number;
+  updatedAt: string;
 }
 
 export default function RepositoryAnalyzer() {
@@ -337,6 +344,11 @@ export default function RepositoryAnalyzer() {
         homepage: data.homepage,
         framework,
         ecosystem,
+
+        watchers: data.subscribers_count,
+        issues: data.open_issues_count,
+        size: data.size,
+        updatedAt: data.updated_at,
       });
     } catch (error) {
       alert("Failed to fetch repository.");
@@ -431,6 +443,10 @@ export default function RepositoryAnalyzer() {
               description={repoData.description}
 
             />
+            <MetricsDashboard
+              repo={repoData}
+              />
+              
             <div className="mt-10 bg-[#111827] rounded-2xl p-8 border border-cyan-500/20">
 
               <h2 className="text-3xl font-bold text-cyan-400 mb-8">
@@ -573,6 +589,9 @@ export default function RepositoryAnalyzer() {
             <RiskAnalyzer
               repo={repoData}
             />
+            <DeploymentPlanner
+              repo={repoData}
+            />  
             <CloudRecommendation
               framework={repoData.framework}
             />
