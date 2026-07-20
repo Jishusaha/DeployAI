@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
+import type { RepoData } from "@/types/repo";
 
-export function downloadPDF(repo: any, score: number) {
+export function downloadPDF(repo: RepoData, score: number) {
 
   const doc = new jsPDF();
 
@@ -47,10 +48,10 @@ export function downloadPDF(repo: any, score: number) {
   doc.text(`Dockerfile: ${repo.hasDockerfile?"Found":"Missing"}`,20,y);
   y+=8;
 
-  doc.text(`GitHub Actions: ${repo.hasGithubActions?"Found":"Missing"}`,20,y);
-  y+=8;
+  doc.text(`GitHub Actions: ${repo.hasGithubActions ? "Found" : "Missing"}`, 20, y);
+  y += 8;
 
-  doc.text(`LICENSE: ${repo.hasLicenseFile?"Found":"Missing"}`,20,y);
+  doc.text(`LICENSE: ${repo.hasLicense ? "Found" : "Missing"}`, 20, y);
   y+=15;
 
   doc.setFontSize(16);

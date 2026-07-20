@@ -1,17 +1,13 @@
+import type { RepoData } from "@/types/repo";
+
 interface Props {
-
-    repo: any;
-
-    score: number;
-
+  repo: RepoData;
+  score: number;
 }
 
 export default function AIVerdict({
-
-    repo,
-
-    score
-
+  repo,
+  score,
 }: Props) {
 
     let verdict = "";

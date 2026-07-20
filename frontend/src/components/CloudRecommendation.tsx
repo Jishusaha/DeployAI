@@ -5,118 +5,118 @@ interface Props {
 export default function CloudRecommendation({
   framework,
 }: Props) {
-
-  let cloud = "";
-  let reason = "";
-  let docker = "";
-  let difficulty = "";
-  let deployTime = "";
+  const recommendation = {
+    cloud: "",
+    reason: "",
+    docker: "",
+    difficulty: "",
+    deployTime: "",
+  };
 
   switch (framework) {
 
     case "Next.js":
-      cloud = "Vercel";
-      docker = "Optional";
-      reason =
+      recommendation.cloud = "Vercel";
+      recommendation.docker = "Optional";
+      recommendation.reason =
         "Optimized for Next.js with automatic deployments.";
       break;
 
     case "React":
-      cloud = "Netlify";
-      docker = "Optional";
-      reason =
+      recommendation.cloud = "Netlify";
+      recommendation.docker = "Optional";
+      recommendation.reason =
         "Excellent for static React applications.";
       break;
 
     case "Vite":
-      cloud = "Netlify";
-      docker = "Optional";
-      reason =
+      recommendation.cloud = "Netlify";
+      recommendation.docker = "Optional";
+      recommendation.reason =
         "Fast deployment for frontend applications.";
       break;
 
     case "Express":
-      cloud = "Render";
-      docker = "Recommended";
-      reason =
+      recommendation.cloud = "Render";
+      recommendation.docker = "Recommended";
+      recommendation.reason =
         "Supports long-running backend services.";
       break;
 
     case "NestJS":
-      cloud = "Railway";
-      docker = "Recommended";
-      reason =
+      recommendation.cloud = "Railway";
+      recommendation.docker = "Recommended";
+      recommendation.reason =
         "Excellent for Node.js backend deployment.";
       break;
 
     case "FastAPI":
-      cloud = "Railway";
-      docker = "Recommended";
-      reason =
+      recommendation.cloud = "Railway";
+      recommendation.docker = "Recommended";
+      recommendation.reason =
         "Ideal for Python APIs.";
       break;
 
     case "Flask":
-      cloud = "Render";
-      docker = "Recommended";
-      reason =
+      recommendation.cloud = "Render";
+      recommendation.docker = "Recommended";
+      recommendation.reason =
         "Simple deployment for Flask projects.";
       break;
 
     case "Django":
-      cloud = "Railway";
-      docker = "Recommended";
-      reason =
+      recommendation.cloud = "Railway";
+      recommendation.docker = "Recommended";
+      recommendation.reason =
         "Supports databases and production hosting.";
       break;
 
     case "Electron":
-      cloud = "Not Applicable";
-      docker = "Not Required";
-      reason =
+      recommendation.cloud = "Not Applicable";
+      recommendation.docker = "Not Required";
+      recommendation.reason =
         "Electron applications are distributed as desktop software.";
       break;
 
     case "Spring Boot":
-      cloud = "AWS";
-      docker = "Recommended";
-      difficulty = "Medium";
-      deployTime = "20 Minutes";
-      reason = "Spring Boot applications are commonly deployed to cloud VMs or containers.";
+      recommendation.cloud = "AWS";
+      recommendation.docker = "Recommended";
+      recommendation.difficulty = "Medium";
+      recommendation.deployTime = "20 Minutes";
+      recommendation.reason = "Spring Boot applications are commonly deployed to cloud VMs or containers.";
       break;
 
     case "Laravel":
-      cloud = "Railway";
-      docker = "Recommended";
-      difficulty = "Medium";
-      deployTime = "15 Minutes";
-      reason = "Laravel works well with managed PHP hosting.";
+      recommendation.cloud = "Railway";
+      recommendation.docker = "Recommended";
+      recommendation.difficulty = "Medium";
+      recommendation.deployTime = "15 Minutes";
+      recommendation.reason = "Laravel works well with managed PHP hosting.";
       break;
 
     case "Go":
-      cloud = "Render";
-      docker = "Optional";
-      difficulty = "Easy";
-      deployTime = "10 Minutes";
-      reason = "Go binaries are lightweight and easy to deploy.";
+      recommendation.cloud = "Render";
+      recommendation.docker = "Optional";
+      recommendation.difficulty = "Easy";
+      recommendation.deployTime = "10 Minutes";
+      recommendation.reason = "Go binaries are lightweight and easy to deploy.";
       break;
 
     case "Rust":
-      cloud = "Fly.io";
-      docker = "Optional";
-      difficulty = "Medium";
-      deployTime = "15 Minutes";
-      reason = "Rust services are well suited for Fly.io deployments.";
+      recommendation.cloud = "Fly.io";
+      recommendation.docker = "Optional";
+      recommendation.difficulty = "Medium";
+      recommendation.deployTime = "15 Minutes";
+      recommendation.reason = "Rust services are well suited for Fly.io deployments.";
       break;
 
     default:
-      cloud = "AWS";
-      docker = "Optional";
-      reason =
-        "General-purpose cloud platform.";
-
-
+      recommendation.cloud = "AWS";
+      recommendation.docker = "Optional";
+      recommendation.reason = "General-purpose cloud platform.";
   }
+
+  const { cloud, docker, reason, difficulty, deployTime } = recommendation;
 
   return (
 
@@ -153,6 +153,20 @@ export default function CloudRecommendation({
           </span>
 
         </div>
+
+        {difficulty && (
+          <div className="flex justify-between">
+            <span className="text-gray-400">Difficulty</span>
+            <span className="font-bold">{difficulty}</span>
+          </div>
+        )}
+
+        {deployTime && (
+          <div className="flex justify-between">
+            <span className="text-gray-400">Estimated Time</span>
+            <span className="font-bold">{deployTime}</span>
+          </div>
+        )}
 
         <div>
 

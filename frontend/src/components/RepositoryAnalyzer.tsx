@@ -13,40 +13,12 @@ import DeploymentPlanner from "./DeploymentPlanner";
 import MetricsDashboard from "./MetricsDashboard";
 import { downloadPDF } from "../utils/pdfReport";
 
-interface RepoData {
-  name: string;
-  owner: string;
-  language: string;
-  stars: number;
-  visibility: string;
-
-  forks: number;
-  hasLicense: boolean;
-  defaultBranch: string;
-
-  hasReadme: boolean;
-  hasPackageJson: boolean;
-  hasDockerfile: boolean;
-  hasGithubActions: boolean;
-
-  description: string;
-  avatar: string;
-  homepage: string;
-
-  framework: string;
-  ecosystem: string;
-
-  watchers: number;
-  issues: number;
-  size: number;
-  updatedAt: string;
-}
+import type { RepoData } from "@/types/repo";
 
 export default function RepositoryAnalyzer() {
   const [repoUrl, setRepoUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [repoData, setRepoData] = useState<RepoData | null>(null);
-
 
   const handleAnalyze = async () => {
     if (!repoUrl.trim()) {
@@ -350,7 +322,7 @@ export default function RepositoryAnalyzer() {
         size: data.size,
         updatedAt: data.updated_at,
       });
-    } catch (error) {
+    } catch {
       alert("Failed to fetch repository.");
     } finally {
       setIsLoading(false);

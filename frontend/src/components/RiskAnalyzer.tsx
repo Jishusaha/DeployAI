@@ -1,5 +1,7 @@
+import type { RepoData } from "@/types/repo";
+
 interface Props {
-    repo: any;
+  repo: RepoData;
 }
 
 export default function RiskAnalyzer({ repo }: Props) {
