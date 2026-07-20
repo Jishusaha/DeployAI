@@ -11,7 +11,7 @@ import AIAnalysis from "./AIAnalysis";
 import RiskAnalyzer from "./RiskAnalyzer";
 import DeploymentPlanner from "./DeploymentPlanner";
 import MetricsDashboard from "./MetricsDashboard";
-
+import { downloadPDF } from "../utils/pdfReport";
 
 interface RepoData {
   name: string;
@@ -445,8 +445,8 @@ export default function RepositoryAnalyzer() {
             />
             <MetricsDashboard
               repo={repoData}
-              />
-              
+            />
+
             <div className="mt-10 bg-[#111827] rounded-2xl p-8 border border-cyan-500/20">
 
               <h2 className="text-3xl font-bold text-cyan-400 mb-8">
@@ -591,10 +591,31 @@ export default function RepositoryAnalyzer() {
             />
             <DeploymentPlanner
               repo={repoData}
-            />  
+            />
             <CloudRecommendation
               framework={repoData.framework}
             />
+            <button
+
+              className="mt-10 w-full bg-cyan-500 hover:bg-cyan-600 rounded-xl py-4 font-bold transition"
+
+              onClick={() =>
+
+                downloadPDF(
+
+                  repoData,
+
+                  calculateHealthScore()
+
+                )
+
+              }
+
+            >
+
+              📄 Download AI Report
+
+            </button>
           </>
         )}
 
