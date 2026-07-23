@@ -15,6 +15,7 @@ import { downloadPDF } from "../utils/pdfReport";
 import LoadingSpinner from "./LoadingSpinner";
 import ProgressBar from "./ProgressBar";
 import ScoreBadge from "./ScoreBadge";
+import DeploymentSimulator from "./DeploymentSimulator";
 
 import type { RepoData } from "@/types/repo";
 
@@ -597,6 +598,9 @@ export default function RepositoryAnalyzer() {
               repo={repoData}
             />
             <DeploymentPlanner
+              repo={repoData}
+            />
+            <DeploymentSimulator
               repo={repoData}
             />
             <CloudRecommendation
